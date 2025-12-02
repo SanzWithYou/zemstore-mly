@@ -1,32 +1,26 @@
-import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import ModeToggle from '../theme/ModeToggle';
 import { toast } from 'sonner';
 import { socialData } from './data/SosialData';
 
+// Komponen footer
 export default function Footer() {
-  // Current year
   const currentYear = new Date().getFullYear();
 
-  // Handle social click
+  // Tangani klik sosial
   const handleSocialClick = (social) => {
     if (social.copyText) {
-      // Copy to clipboard
       navigator.clipboard.writeText(social.copyText);
       toast.success(`${social.label} berhasil disalin!`);
     } else if (social.href) {
-      // Open link
       window.open(social.href, '_blank', 'noopener,noreferrer');
     }
   };
 
   return (
-    // Footer container
     <footer className='bg-muted/30 border-t border-border'>
       <div className='container mx-auto px-4 py-8'>
-        {/* Grid layout */}
         <div className='grid grid-cols-1 md:grid-cols-3 gap-8'>
-          {/* Logo section */}
           <div className='col-span-1 md:col-span-2'>
             <div className='select-none mb-4'>
               <h1 className='text-xl font-bold tracking-wide'>Zem Store</h1>
@@ -38,10 +32,9 @@ export default function Footer() {
             </p>
           </div>
 
-          {/* Contact section */}
           <div>
             <h3 className='font-semibold mb-4 text-sm'>Kontak Kami</h3>
-            {/* Social buttons */}
+
             <div className='flex flex-wrap gap-3'>
               {socialData.map((social) => (
                 <Button
@@ -58,7 +51,6 @@ export default function Footer() {
               ))}
             </div>
 
-            {/* Instructions */}
             <div className='mt-3 text-sm text-muted-foreground'>
               <span>
                 Klik ikon untuk{' '}
@@ -69,7 +61,6 @@ export default function Footer() {
           </div>
         </div>
 
-        {/* Copyright section */}
         <div className='border-t border-border mt-8 pt-6 flex flex-col md:flex-row justify-between items-center'>
           <p className='text-xs text-muted-foreground'>
             © {currentYear} Zem Store. Hak Cipta Dilindungi.

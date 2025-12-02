@@ -41,8 +41,8 @@ import {
   Loader2,
 } from 'lucide-react';
 
+// Komponen instruksi order
 const OrderInstructions = ({
-  // Props
   paymentMethod,
   setPaymentMethod,
   selectedBank,
@@ -60,12 +60,13 @@ const OrderInstructions = ({
   getSelectedEwalletDetails,
   getSelectedQrisDetails,
 }) => {
-  const [qrisImageError, setQrisImageError] = useState(false); // Error state
-  const [isDownloading, setIsDownloading] = useState(false); // Download state
+  const [qrisImageError, setQrisImageError] = useState(false);
+  const [isDownloading, setIsDownloading] = useState(false);
 
   // Download QRIS
   const handleDownloadQris = async () => {
     const qrDetails = getSelectedQrisDetails();
+    // Validasi QRIS
     if (qrDetails && qrDetails.qrImage) {
       setIsDownloading(true);
 
@@ -90,11 +91,10 @@ const OrderInstructions = ({
   };
 
   React.useEffect(() => {
-    // Reset error
     setQrisImageError(false);
   }, [selectedQris]);
 
-  // Validasi options
+  // Validasi opsi
   const isBankEmpty = !bankOptions || bankOptions.length === 0;
   const isEwalletEmpty = !ewalletOptions || ewalletOptions.length === 0;
   const isQrisEmpty = !qrisOptions || qrisOptions.length === 0;
@@ -112,7 +112,6 @@ const OrderInstructions = ({
           </CardDescription>
         </CardHeader>
         <CardContent className='space-y-4 md:space-y-6'>
-          {/* Step 1 */}
           <div className='flex gap-3 md:gap-4'>
             <div className='shrink-0'>
               <div className='w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center'>
@@ -131,7 +130,6 @@ const OrderInstructions = ({
             </div>
           </div>
 
-          {/* Step 2 */}
           <div className='flex gap-3 md:gap-4'>
             <div className='shrink-0'>
               <div className='w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center'>
@@ -150,7 +148,6 @@ const OrderInstructions = ({
             </div>
           </div>
 
-          {/* Step 3 */}
           <div className='flex gap-3 md:gap-4'>
             <div className='shrink-0'>
               <div className='w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center'>
@@ -169,7 +166,6 @@ const OrderInstructions = ({
             </div>
           </div>
 
-          {/* Step 4 */}
           <div className='flex gap-3 md:gap-4'>
             <div className='shrink-0'>
               <div className='w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center'>
@@ -193,7 +189,7 @@ const OrderInstructions = ({
 
       {/* Payment Selection */}
       <Card>
-        <CardHeader className='pb-4'>
+        <CardHeader>
           <CardTitle className='flex items-center text-lg md:text-xl'>
             <CreditCard className='mr-2 h-5 w-5' />
             Metode Pembayaran
@@ -203,7 +199,8 @@ const OrderInstructions = ({
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <RadioGroup // Pilih metode
+          {/* Pilih metode pembayaran */}
+          <RadioGroup
             value={paymentMethod}
             onValueChange={setPaymentMethod}
             className='grid grid-cols-1 sm:grid-cols-3 gap-2 md:gap-4'
@@ -259,7 +256,6 @@ const OrderInstructions = ({
               </Label>
             </div>
           </RadioGroup>
-
           {/* Bank Payment */}
           {paymentMethod === 'bank' && (
             <div className='mt-4'>
@@ -378,7 +374,6 @@ const OrderInstructions = ({
               )}
             </div>
           )}
-
           {/* E-wallet Payment */}
           {paymentMethod === 'ewallet' && (
             <div className='mt-4'>
@@ -497,7 +492,6 @@ const OrderInstructions = ({
               )}
             </div>
           )}
-
           {/* QRIS Payment */}
           {paymentMethod === 'qris' && (
             <div className='mt-4'>

@@ -6,7 +6,7 @@ import { AnimatedGridPattern } from '@/components/ui/animated-grid-pattern';
 export function HeroSection() {
   return (
     <section className='relative min-h-screen overflow-hidden text-foreground'>
-      {/* Background */}
+      {/* Latar belakang */}
       <div className='absolute inset-0 z-0'>
         <AnimatedGridPattern
           width={40}
@@ -24,7 +24,7 @@ export function HeroSection() {
         />
       </div>
 
-      {/* Content */}
+      {/* Konten utama */}
       <div className='relative z-10 h-screen flex items-center justify-center'>
         <div className='container mx-auto px-4'>
           <div className='max-w-3xl mx-auto text-center'>
@@ -42,7 +42,7 @@ export function HeroSection() {
               cepat, dan terpercaya.
             </p>
 
-            {/* Buttons */}
+            {/* Tombol aksi */}
             <div className='flex flex-col sm:flex-row gap-4 justify-center mb-12'>
               <Button size='lg' className='font-bold text-lg px-8 py-3'>
                 Pesan Sekarang
@@ -56,7 +56,7 @@ export function HeroSection() {
               </Button>
             </div>
 
-            {/* Stats */}
+            {/* Statistik */}
             <div className='grid grid-cols-3 gap-4 max-w-md mx-auto'>
               <div className='text-center'>
                 <div className='text-3xl font-bold text-accent-foreground'>

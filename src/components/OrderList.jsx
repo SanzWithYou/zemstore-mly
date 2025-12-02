@@ -7,10 +7,10 @@ const OrderList = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [previewFile, setPreviewFile] = useState(null);
-  const [previewVariant, setPreviewVariant] = useState('compact'); // 'compact' or 'wide'
-  const [deleteLoading, setDeleteLoading] = useState(null); // Untuk melacak order yang sedang dihapus
+  const [previewVariant, setPreviewVariant] = useState('compact');
+  const [deleteLoading, setDeleteLoading] = useState(null);
 
-  // Fungsi untuk mengambil data order
+  // Ambil data order
   const fetchOrders = async () => {
     setLoading(true);
     setError(null);
@@ -19,7 +19,9 @@ const OrderList = () => {
       const response = await axios.get('http://localhost:3000/api/orders');
 
       if (response.data.success) {
-        setOrders(response.data.data);
+        // Ambil data orders dari response
+        const ordersData = response.data.data.orders;
+        setOrders(ordersData);
       } else {
         setError(response.data.message);
       }
@@ -38,26 +40,26 @@ const OrderList = () => {
     fetchOrders();
   }, []);
 
-  // Fungsi untuk refresh data
+  // Refresh data
   const handleRefresh = () => {
     fetchOrders();
   };
 
-  // Fungsi untuk format nama file
+  // Format nama file
   const formatFileName = (path) => {
     if (!path) return '-';
     const parts = path.split('/');
     return parts[parts.length - 1];
   };
 
-  // Fungsi untuk preview bukti transfer
+  // Preview transfer
   const handlePreview = (path) => {
     if (!path) return;
 
-    // Build file URL
+    // URL file
     const fileUrl = `http://localhost:3000/api/files/${path}`;
 
-    // Set preview file data
+    // Set preview
     setPreviewFile({
       url: fileUrl,
       name: formatFileName(path),
@@ -65,7 +67,7 @@ const OrderList = () => {
     });
   };
 
-  // Fungsi untuk download file
+  // Download file
   const handleDownload = (path) => {
     if (!path) return;
 
@@ -82,14 +84,14 @@ const OrderList = () => {
     document.body.removeChild(link);
   };
 
-  // Fungsi untuk menutup preview
+  // Tutup preview
   const closePreview = () => {
     setPreviewFile(null);
   };
 
-  // Fungsi untuk menghapus order
+  // Hapus order
   const handleDelete = async (id) => {
-    // Konfirmasi sebelum menghapus
+    // Konfirmasi
     if (!window.confirm('Apakah Anda yakin ingin menghapus order ini?')) {
       return;
     }
@@ -101,7 +103,7 @@ const OrderList = () => {
       );
 
       if (response.data.success) {
-        // Update state dengan menghapus order yang sudah dihapus
+        // Update state
         setOrders(orders.filter((order) => order.id !== id));
       } else {
         setError(response.data.message || 'Gagal menghapus order');
@@ -116,7 +118,7 @@ const OrderList = () => {
     }
   };
 
-  // Fungsi untuk mendeteksi tipe file
+  // Deteksi tipe file
   const getFileType = (filename) => {
     const ext = filename.split('.').pop().toLowerCase();
     if (['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(ext)) {
@@ -127,7 +129,7 @@ const OrderList = () => {
     return 'other';
   };
 
-  // Fungsi untuk toggle variant
+  // Toggle variant
   const toggleVariant = () => {
     setPreviewVariant((prev) => (prev === 'compact' ? 'wide' : 'compact'));
   };
@@ -135,6 +137,7 @@ const OrderList = () => {
   if (loading) {
     return (
       <div className='max-w-4xl mx-auto mt-10 p-6 bg-white rounded-lg shadow-md'>
+        {/* Loading spinner */}
         <div className='flex justify-center items-center h-64'>
           <div className='animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600'></div>
         </div>
@@ -146,6 +149,7 @@ const OrderList = () => {
     return (
       <div className='max-w-4xl mx-auto mt-10 p-6 bg-white rounded-lg shadow-md'>
         <div className='text-center'>
+          {/* Pesan error */}
           <div className='text-red-500 mb-4'>❌ {error}</div>
           <button
             onClick={handleRefresh}
@@ -162,6 +166,7 @@ const OrderList = () => {
     <div className='max-w-4xl mx-auto mt-10 p-6 bg-white rounded-lg shadow-md'>
       <div className='flex justify-between items-center mb-6'>
         <h2 className='text-2xl font-bold'>Daftar Order</h2>
+        {/* Tombol refresh */}
         <button
           onClick={handleRefresh}
           className='bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 flex items-center'
@@ -197,6 +202,9 @@ const OrderList = () => {
                   ID
                 </th>
                 <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
+                  Tanggal
+                </th>
+                <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
                   Jenis Joki
                 </th>
                 <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
@@ -214,7 +222,10 @@ const OrderList = () => {
                     #{order.id}
                   </td>
                   <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-900'>
-                    {order.joki}
+                    {new Date(order.createdAt).toLocaleDateString('id-ID')}
+                  </td>
+                  <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-900'>
+                    {order.jenis_joki}
                   </td>
                   <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-900'>
                     <div className='flex items-center'>
@@ -287,9 +298,9 @@ const OrderList = () => {
       {/* Preview Modal */}
       {previewFile && (
         <div className='fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4'>
-          {/* PENANDA: Modal container - Menyesuaikan ukuran sesuai konten */}
+          {/* Modal container */}
           <div className='bg-white rounded-lg min-w-[300px] min-h-[400px] max-w-[90vw] max-h-[90vh] overflow-hidden shadow-2xl flex flex-col'>
-            {/* Modal Header - Sticky */}
+            {/* Modal Header */}
             <div className='sticky top-0 z-10 flex justify-between items-center p-6 border-b bg-gray-50 backdrop-blur-sm bg-opacity-95'>
               <div>
                 <h3 className='text-xl font-semibold text-gray-800'>
@@ -325,7 +336,7 @@ const OrderList = () => {
               </div>
             </div>
 
-            {/* Modal Content - Scrollable */}
+            {/* Modal Content */}
             <div className='flex-1 overflow-auto bg-gray-50'>
               {getFileType(previewFile.name) === 'pdf' ? (
                 <div className='flex justify-center min-h-[70vh]'>
@@ -357,7 +368,7 @@ const OrderList = () => {
                   {/* Variant 2: Wide View */}
                   {previewVariant === 'wide' && (
                     <div className='w-full max-w-3xl'>
-                      {/* PENANDA: Aspect Ratio untuk Wide View - Ubah ratio di sini */}
+                      {/* Aspect ratio wide */}
                       <AspectRatio
                         ratio={9 / 16}
                         className='bg-white border-2 border-gray-200 rounded-lg shadow-lg'
@@ -374,7 +385,7 @@ const OrderList = () => {
               )}
             </div>
 
-            {/* Modal Footer - Sticky */}
+            {/* Modal Footer */}
             <div className='sticky bottom-0 z-10 flex justify-between items-center p-6 border-t bg-gray-50 backdrop-blur-sm bg-opacity-95'>
               <div className='text-sm text-gray-500'>
                 {previewVariant === 'compact' ? 'Compact View' : 'Wide View'} •

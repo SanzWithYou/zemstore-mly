@@ -6,12 +6,10 @@ import { Textarea } from '@/components/ui/textarea';
 import { Send, Loader2 } from 'lucide-react';
 import { useCustomServiceRequest } from './hooks/useCustomServiceRequest';
 
-// Form component
+// Komponen form layanan
 const ServiceRequestForm = ({ onSuccess }) => {
-  // Custom hook
   const { isSubmitting, submitRequest } = useCustomServiceRequest();
 
-  // Form setup
   const {
     register,
     handleSubmit,
@@ -26,7 +24,7 @@ const ServiceRequestForm = ({ onSuccess }) => {
     mode: 'onBlur',
   });
 
-  // Submit handler
+  // Proses submit form
   const onFormSubmit = (data) => {
     submitRequest(data, onSuccess);
     reset();
@@ -34,7 +32,6 @@ const ServiceRequestForm = ({ onSuccess }) => {
 
   return (
     <form onSubmit={handleSubmit(onFormSubmit)} className='space-y-4'>
-      {/* Name field */}
       <div className='space-y-2'>
         <Label htmlFor='name'>Nama Lengkap</Label>
         <Input
@@ -48,7 +45,6 @@ const ServiceRequestForm = ({ onSuccess }) => {
         )}
       </div>
 
-      {/* Email field */}
       <div className='space-y-2'>
         <Label htmlFor='email'>Email</Label>
         <Input
@@ -68,7 +64,6 @@ const ServiceRequestForm = ({ onSuccess }) => {
         )}
       </div>
 
-      {/* Service description */}
       <div className='space-y-2'>
         <Label htmlFor='service'>Deskripsi Layanan yang Dibutuhkan</Label>
         <Textarea
@@ -88,7 +83,6 @@ const ServiceRequestForm = ({ onSuccess }) => {
         )}
       </div>
 
-      {/* Submit button */}
       <Button type='submit' className='w-full' disabled={isSubmitting}>
         {isSubmitting ? (
           <>

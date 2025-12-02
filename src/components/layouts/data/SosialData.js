@@ -1,4 +1,3 @@
-// components/data/SosialData.js
 import { Mail } from 'lucide-react';
 import {
   SiTiktok,

@@ -17,7 +17,7 @@ import ServiceRequestForm from './ServiceRequestForm';
 import jokiCategories from './data/jokiCategories'; // Import data
 
 const JokiVariant1 = () => {
-  // Format Rupiah
+  // Format mata uang
   const formatIdr = (price) => {
     return new Intl.NumberFormat('id-ID', {
       style: 'currency',
@@ -27,7 +27,7 @@ const JokiVariant1 = () => {
     }).format(price);
   };
 
-  // Format Ringgit
+  // Format ringgit
   const formatMyr = (price) => {
     return new Intl.NumberFormat('ms-MY', {
       style: 'currency',
@@ -37,10 +37,10 @@ const JokiVariant1 = () => {
     }).format(price);
   };
 
-  // States
+  // Inisialisasi state
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [paginationState, setPaginationState] = useState({});
-  const itemsPerPage = 6; // Item per halaman
+  const itemsPerPage = 6;
 
   // Cek layout
   const shouldUseSplitLayout = (categoryId) => {
@@ -49,12 +49,12 @@ const JokiVariant1 = () => {
     );
   };
 
-  // Cek pagination
+  // Validasi pagination
   const needsPagination = (data) => {
     return data.length > itemsPerPage;
   };
 
-  // Data kolom kiri
+  // Ambil data kiri
   const getLeftColumnServices = (category) => {
     if (category.id === 'level-mastery') {
       return category.services.filter((service) =>
@@ -67,7 +67,7 @@ const JokiVariant1 = () => {
     }
   };
 
-  // Data kolom kanan
+  // Ambil data kanan
   const getRightColumnServices = (category) => {
     if (category.id === 'level-mastery') {
       return category.services.filter((service) =>
@@ -80,7 +80,7 @@ const JokiVariant1 = () => {
     }
   };
 
-  // Judul kolom kiri
+  // Ambil judul kiri
   const getLeftColumnTitle = (category) => {
     if (category.id === 'level-mastery') {
       return 'Level';
@@ -91,7 +91,7 @@ const JokiVariant1 = () => {
     }
   };
 
-  // Judul kolom kanan
+  // Ambil judul kanan
   const getRightColumnTitle = (category) => {
     if (category.id === 'level-mastery') {
       return 'Mastery';
@@ -102,7 +102,7 @@ const JokiVariant1 = () => {
     }
   };
 
-  // Data terpaginasi
+  // Hitung data halaman
   const getPaginatedData = (data, paginationId) => {
     if (!needsPagination(data)) {
       return data;
@@ -119,7 +119,7 @@ const JokiVariant1 = () => {
     return data.slice(startIndex, endIndex);
   };
 
-  // Total halaman
+  // Hitung total halaman
   const getTotalPages = (data) => {
     return Math.ceil(data.length / itemsPerPage);
   };
@@ -134,7 +134,7 @@ const JokiVariant1 = () => {
     setIsDialogOpen(false);
   };
 
-  // Komponen Pagination
+  // Komponen pagination
   const Pagination = ({ paginationId, totalItemsCount }) => {
     if (totalItemsCount <= itemsPerPage) {
       return null;
@@ -177,7 +177,7 @@ const JokiVariant1 = () => {
     );
   };
 
-  // Komponen Service Item
+  // Komponen service item
   const ServiceItem = ({ service }) => {
     return (
       <div className='border border-border rounded-lg p-4'>
@@ -197,18 +197,18 @@ const JokiVariant1 = () => {
 
   return (
     <div className='bg-background pb-12'>
-      {/* Header */}
+      {/* Header informasi */}
       <HeaderInfo
         badgeText='Layanan Joki'
         title='Joki Blox Fruit'
         description='Pilih layanan joki yang Anda butuhkan dari daftar yang tersedia. Kami menyediakan berbagai layanan joki untuk game Blox Fruit Roblox.'
       />
 
-      {/* Main Content */}
+      {/* Konten utama */}
       <div className='container mx-auto px-4'>
-        {/* Tabs */}
+        {/* Tab utama */}
         <Tabs defaultValue={jokiCategories[0].id} className='w-full'>
-          {/* Menu kategori */}
+          {/* Menu tab kategori */}
           <TabsList className='grid w-full grid-cols-10 mb-2 px-2'>
             {jokiCategories.map((category) => (
               <TabsTrigger
@@ -224,7 +224,7 @@ const JokiVariant1 = () => {
             ))}
           </TabsList>
 
-          {/* Konten kategori */}
+          {/* Konten tab */}
           {jokiCategories.map((category) => (
             <TabsContent
               key={category.id}
@@ -244,7 +244,7 @@ const JokiVariant1 = () => {
                 </CardHeader>
 
                 <CardContent>
-                  {/* Layout 2 kolom */}
+                  {/* Layout dua kolom */}
                   {shouldUseSplitLayout(category.id) ? (
                     <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
                       {/* Kolom kiri */}
@@ -260,7 +260,7 @@ const JokiVariant1 = () => {
                             <ServiceItem key={service.id} service={service} />
                           ))}
                         </div>
-                        {/* Pagination kiri */}
+                        {/* Pagination kolom kiri */}
                         <Pagination
                           paginationId={`${category.id}-left`}
                           totalItemsCount={
@@ -282,7 +282,7 @@ const JokiVariant1 = () => {
                             <ServiceItem key={service.id} service={service} />
                           ))}
                         </div>
-                        {/* Pagination kanan */}
+                        {/* Pagination kolom kanan */}
                         <Pagination
                           paginationId={`${category.id}-right`}
                           totalItemsCount={
@@ -292,7 +292,7 @@ const JokiVariant1 = () => {
                       </div>
                     </div>
                   ) : (
-                    /* Layout 1 kolom */
+                    /* Layout satu kolom */
                     <div className='space-y-4'>
                       {getPaginatedData(category.services, category.id).map(
                         (service) => (
@@ -312,7 +312,7 @@ const JokiVariant1 = () => {
           ))}
         </Tabs>
 
-        {/* Dialog kustom */}
+        {/* Dialog request custom */}
         <div className='mt-8 flex justify-center'>
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>

@@ -1,6 +1,5 @@
-// components/order/hooks/useOrderApi.js
 import { useState } from 'react';
-import api from '../../../config/api'; // Sesuaikan path
+import api from '@/config/api';
 import { toast } from 'sonner';
 
 export const useOrderApi = () => {
@@ -8,22 +7,13 @@ export const useOrderApi = () => {
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
 
-  const submitOrder = async (
-    formData,
-    resetForm,
-    setFile,
-    setPreview,
-    setPaymentMethod,
-    setSelectedBank,
-    setSelectedEwallet,
-    setSelectedQris
-  ) => {
+  const submitOrder = async (formData, resetForm, setFile, setPreview) => {
     setLoading(true);
     setError(null);
     setSuccess(false);
 
     try {
-      const response = await api.post('/api/orders', formData, {
+      const response = await api.post('/api/joki/orders', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
@@ -34,10 +24,6 @@ export const useOrderApi = () => {
         resetForm();
         setFile(null);
         setPreview(null);
-        setPaymentMethod('bank');
-        setSelectedBank('');
-        setSelectedEwallet('');
-        setSelectedQris('');
       } else {
         setError(response.data.message);
       }

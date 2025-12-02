@@ -19,9 +19,12 @@ import {
   Loader2,
   Gamepad2,
   QrCode,
+  Info,
 } from 'lucide-react';
 import { toast } from 'sonner';
+import DOMPurify from 'dompurify';
 
+// Komponen form order
 const OrderForm = ({
   file,
   preview,
@@ -34,7 +37,6 @@ const OrderForm = ({
   handleSubmit,
   validationSchema,
 }) => {
-  // Handle file drop
   const onDrop = useCallback(
     (acceptedFiles) => {
       if (acceptedFiles && acceptedFiles.length > 0) {
@@ -51,7 +53,7 @@ const OrderForm = ({
       'image/*': ['.jpeg', '.jpg', '.png'],
       'application/pdf': ['.pdf'],
     },
-    maxSize: 2 * 1024 * 1024, // 2MB
+    maxSize: 2 * 1024 * 1024,
     maxFiles: 1,
     onDropRejected: (rejectedFiles) => {
       if (rejectedFiles && rejectedFiles.length > 0) {
@@ -67,7 +69,6 @@ const OrderForm = ({
     },
   });
 
-  // Get payment icon
   const getPaymentIcon = () => {
     if (paymentMethod === 'bank') return <Gamepad2 className='h-4 w-4' />;
     if (paymentMethod === 'ewallet') return <FileImage className='h-4 w-4' />;
@@ -75,15 +76,42 @@ const OrderForm = ({
     return <Gamepad2 className='h-4 w-4' />;
   };
 
-  // Get payment text
   const getPaymentText = () => {
     if (paymentMethod === 'bank' && selectedBank)
-      return `Bank: ${selectedBank}`;
+      return `Bank: ${DOMPurify.sanitize(selectedBank)}`;
     if (paymentMethod === 'ewallet' && selectedEwallet)
-      return `E-Wallet: ${selectedEwallet}`;
+      return `E-Wallet: ${DOMPurify.sanitize(selectedEwallet)}`;
     if (paymentMethod === 'qris' && selectedQris)
-      return `QRIS: ${selectedQris}`;
+      return `QRIS: ${DOMPurify.sanitize(selectedQris)}`;
     return 'Pilih metode pembayaran di panel sebelah kiri';
+  };
+
+  // Format nomor whatsapp
+  const formatWhatsAppNumber = (value) => {
+    let formattedValue = value.replace(/\D/g, '');
+
+    if (formattedValue.startsWith('0')) {
+      formattedValue = '62' + formattedValue.substring(1);
+    } else if (
+      formattedValue.startsWith('1') &&
+      !formattedValue.startsWith('60') &&
+      !formattedValue.startsWith('62')
+    ) {
+      formattedValue = '60' + formattedValue;
+    } else if (
+      formattedValue.startsWith('62') ||
+      formattedValue.startsWith('60')
+    ) {
+    }
+    return formattedValue;
+  };
+
+  // Bersihkan input
+  const sanitizeInput = (value) => {
+    return DOMPurify.sanitize(value, {
+      ALLOWED_TAGS: [],
+      ALLOWED_ATTR: [],
+    });
   };
 
   return (
@@ -104,11 +132,24 @@ const OrderForm = ({
               username: '',
               password: '',
               joki: '',
+              tiktokUsername: '',
+              whatsappNumber: '',
             }}
             validationSchema={validationSchema}
-            onSubmit={handleSubmit}
+            onSubmit={(values, { setSubmitting, resetForm }) => {
+              // Bersihkan data
+              const sanitizedValues = {
+                username: sanitizeInput(values.username),
+                password: values.password,
+                joki: sanitizeInput(values.joki),
+                tiktokUsername: sanitizeInput(values.tiktokUsername),
+                whatsappNumber: values.whatsappNumber,
+              };
+
+              handleSubmit(sanitizedValues, { setSubmitting, resetForm });
+            }}
           >
-            {({ isSubmitting }) => (
+            {({ isSubmitting, setFieldValue, values }) => (
               <Form className='space-y-4'>
                 <div className='space-y-2'>
                   <Label htmlFor='username' className='text-sm'>
@@ -166,6 +207,62 @@ const OrderForm = ({
                 </div>
 
                 <div className='space-y-2'>
+                  <Label htmlFor='tiktokUsername' className='text-sm'>
+                    Username TikTok
+                  </Label>
+                  <Field
+                    as={Input}
+                    id='tiktokUsername'
+                    name='tiktokUsername'
+                    placeholder='@username_tiktok'
+                    className='h-10'
+                  />
+                  <ErrorMessage
+                    name='tiktokUsername'
+                    component='div'
+                    className='text-xs text-red-500'
+                  />
+                </div>
+
+                <div className='space-y-2'>
+                  <Label htmlFor='whatsappNumber' className='text-sm'>
+                    Nomor WhatsApp
+                  </Label>
+                  <Field
+                    as={Input}
+                    id='whatsappNumber'
+                    name='whatsappNumber'
+                    placeholder='Contoh: 08123456789 (ID) atau 123456789 (MY)'
+                    className='h-10'
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      // Tambah input pengguna
+                      if (value.length > values.whatsappNumber.length) {
+                        setFieldValue(
+                          'whatsappNumber',
+                          formatWhatsAppNumber(value)
+                        );
+                      } else {
+                        setFieldValue('whatsappNumber', value);
+                      }
+                    }}
+                  />
+                  <ErrorMessage
+                    name='whatsappNumber'
+                    component='div'
+                    className='text-xs text-red-500'
+                  />
+                  <div className='flex items-start mt-1'>
+                    <Info className='h-3 w-3 text-muted-foreground mr-1 mt-0.5 shrink-0' />
+                    <p className='text-xs text-muted-foreground'>
+                      Format otomatis: Indonesia (0xxx → 62xxx) atau Malaysia
+                      (1xxx → 601xxx). Untuk negara lain, masukkan dengan kode
+                      negara lengkap.
+                    </p>
+                  </div>
+                </div>
+
+                <div className='space-y-2'>
                   <Label className='text-sm'>Metode Pembayaran</Label>
                   <div className='flex items-center space-x-2 p-3 bg-muted rounded-md'>
                     {getPaymentIcon()}
@@ -196,7 +293,7 @@ const OrderForm = ({
                           <FileText className='h-8 w-8 md:h-10 md:w-10 text-muted-foreground mb-1 md:mb-2' />
                         )}
                         <p className='text-xs text-muted-foreground truncate max-w-full'>
-                          {file.name}
+                          {DOMPurify.sanitize(file.name)}
                         </p>
                         <p className='text-xs text-muted-foreground'>
                           Klik atau drag untuk mengganti
@@ -230,6 +327,7 @@ const OrderForm = ({
                     isSubmitting ||
                     loading ||
                     !file ||
+                    (!values.tiktokUsername && !values.whatsappNumber) ||
                     (paymentMethod === 'bank' && !selectedBank) ||
                     (paymentMethod === 'ewallet' && !selectedEwallet) ||
                     (paymentMethod === 'qris' && !selectedQris)

@@ -1,8 +1,8 @@
-// components/joki/hooks/useCustomServiceRequest.js
 import { useState } from 'react';
-import api from '../../../config/api'; // Sesuaikan path
+import api from '../../../config/api';
 import { toast } from 'sonner';
 
+// Kelola permintaan custom
 export const useCustomServiceRequest = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 

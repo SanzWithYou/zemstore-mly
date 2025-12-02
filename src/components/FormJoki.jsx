@@ -59,7 +59,7 @@ const FormJoki = () => {
   const [selectedEwallet, setSelectedEwallet] = useState('');
   const [copiedItem, setCopiedItem] = useState('');
 
-  // Effect untuk menampilkan toast saat success berubah
+  // Tampilkan toast sukses
   useEffect(() => {
     if (success) {
       toast.success(
@@ -68,21 +68,21 @@ const FormJoki = () => {
     }
   }, [success]);
 
-  // Effect untuk menampilkan toast saat error berubah
+  // Tampilkan toast error
   useEffect(() => {
     if (error) {
       toast.error(error);
     }
   }, [error]);
 
-  // Schema validasi form
+  // Validasi form
   const validationSchema = Yup.object().shape({
     username: Yup.string().required('Username wajib diisi'),
     password: Yup.string().required('Password wajib diisi'),
     joki: Yup.string().required('Jenis joki wajib diisi'),
   });
 
-  // Handle file change
+  // Ubah file
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
     if (selectedFile) {
@@ -91,7 +91,7 @@ const FormJoki = () => {
     }
   };
 
-  // Handle form submit
+  // Submit form
   const handleSubmit = async (values, { setSubmitting, resetForm }) => {
     setLoading(true);
     setError(null);
@@ -146,7 +146,7 @@ const FormJoki = () => {
     }
   };
 
-  // Copy to clipboard function
+  // Salin ke clipboard
   const copyToClipboard = (text, type) => {
     navigator.clipboard
       .writeText(text)
@@ -160,7 +160,7 @@ const FormJoki = () => {
       });
   };
 
-  // Bank options dengan detail informasi
+  // Data opsi bank
   const bankOptions = [
     {
       id: 'bca',
@@ -206,7 +206,7 @@ const FormJoki = () => {
     },
   ];
 
-  // E-wallet options dengan detail informasi
+  // Data opsi e-wallet
   const ewalletOptions = [
     {
       id: 'gopay',
@@ -246,19 +246,19 @@ const FormJoki = () => {
     },
   ];
 
-  // Mendapatkan detail bank yang dipilih
+  // Ambil detail bank
   const getSelectedBankDetails = () => {
     return bankOptions.find((bank) => bank.id === selectedBank);
   };
 
-  // Mendapatkan detail e-wallet yang dipilih
+  // Ambil detail e-wallet
   const getSelectedEwalletDetails = () => {
     return ewalletOptions.find((ewallet) => ewallet.id === selectedEwallet);
   };
 
   return (
     <div className='min-h-screen bg-background'>
-      {/* Header Information Section */}
+      {/* Bagian informasi header */}
       <div className='text-center mb-12 pt-16 pb-8'>
         <Badge variant='secondary' className='mb-4'>
           Proses Pemesanan
@@ -273,10 +273,10 @@ const FormJoki = () => {
         </p>
       </div>
 
-      {/* Main Content - 2 Column Layout */}
+      {/* Konten utama */}
       <div className='max-w-6xl mx-auto px-4 pb-16'>
         <div className='grid grid-cols-1 lg:grid-cols-2 gap-8 items-start'>
-          {/* Left Column - How to Order */}
+          {/* Kolom kiri */}
           <div className='space-y-6'>
             <Card>
               <CardHeader>
@@ -289,9 +289,9 @@ const FormJoki = () => {
                 </CardDescription>
               </CardHeader>
               <CardContent className='space-y-6'>
-                {/* Step 1 */}
+                {/* Langkah pertama */}
                 <div className='flex gap-4'>
-                  <div className='flex-shrink-0'>
+                  <div className='shrink-0'>
                     <div className='w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center'>
                       <Circle className='h-5 w-5 text-primary' />
                     </div>
@@ -305,9 +305,9 @@ const FormJoki = () => {
                   </div>
                 </div>
 
-                {/* Step 2 */}
+                {/* Langkah kedua */}
                 <div className='flex gap-4'>
-                  <div className='flex-shrink-0'>
+                  <div className='shrink-0'>
                     <div className='w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center'>
                       <CircleDot className='h-5 w-5 text-primary' />
                     </div>
@@ -321,9 +321,9 @@ const FormJoki = () => {
                   </div>
                 </div>
 
-                {/* Step 3 */}
+                {/* Langkah ketiga */}
                 <div className='flex gap-4'>
-                  <div className='flex-shrink-0'>
+                  <div className='shrink-0'>
                     <div className='w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center'>
                       <CircleDashed className='h-5 w-5 text-primary' />
                     </div>
@@ -337,9 +337,9 @@ const FormJoki = () => {
                   </div>
                 </div>
 
-                {/* Step 4 */}
+                {/* Langkah keempat */}
                 <div className='flex gap-4'>
-                  <div className='flex-shrink-0'>
+                  <div className='shrink-0'>
                     <div className='w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center'>
                       <CircleCheck className='h-5 w-5 text-primary' />
                     </div>
@@ -394,7 +394,7 @@ const FormJoki = () => {
                   </div>
                 </RadioGroup>
 
-                {/* Bank Selection */}
+                {/* Pilih bank */}
                 {paymentMethod === 'bank' && (
                   <div className='mt-4'>
                     <Dialog>
@@ -440,7 +440,7 @@ const FormJoki = () => {
                       </DialogContent>
                     </Dialog>
 
-                    {/* Bank Details */}
+                    {/* Detail bank */}
                     {selectedBank && (
                       <div className='mt-4 p-4 bg-muted/50 rounded-lg border'>
                         <div className='flex items-center mb-3'>
@@ -505,7 +505,7 @@ const FormJoki = () => {
                   </div>
                 )}
 
-                {/* E-wallet Selection */}
+                {/* Pilih e-wallet */}
                 {paymentMethod === 'ewallet' && (
                   <div className='mt-4'>
                     <Dialog>
@@ -553,7 +553,7 @@ const FormJoki = () => {
                       </DialogContent>
                     </Dialog>
 
-                    {/* E-wallet Details */}
+                    {/* Detail e-wallet */}
                     {selectedEwallet && (
                       <div className='mt-4 p-4 bg-muted/50 rounded-lg border'>
                         <div className='flex items-center mb-3'>
@@ -614,7 +614,7 @@ const FormJoki = () => {
               </CardContent>
             </Card>
 
-            {/* Info Cards */}
+            {/* Info card */}
             <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
               <div className='flex items-center justify-center p-4 bg-muted/50 rounded-lg'>
                 <ShoppingCart className='h-5 w-5 text-primary mr-2' />
@@ -631,7 +631,7 @@ const FormJoki = () => {
             </div>
           </div>
 
-          {/* Right Column - Form */}
+          {/* Kolom kanan */}
           <div className='lg:sticky lg:top-8'>
             <Card>
               <CardHeader className='text-center'>
