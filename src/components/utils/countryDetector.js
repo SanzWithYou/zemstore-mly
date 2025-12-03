@@ -1,5 +1,3 @@
-// src/components/utils/countryDetector.js
-
 import { useQuery } from '@tanstack/react-query';
 import { SUPPORTED_COUNTRIES } from './supportedCountries';
 
