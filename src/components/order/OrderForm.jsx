@@ -4,6 +4,7 @@ import { Formik, Form, Field, ErrorMessage } from 'formik';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import {
   Card,
   CardContent,
@@ -24,6 +25,12 @@ import {
 import { toast } from 'sonner';
 import DOMPurify from 'dompurify';
 
+// Import dari countryDetector.js
+import {
+  useCountryDetection,
+  formatWhatsAppNumber,
+} from '../utils/countryDetector.js';
+
 // Komponen form order
 const OrderForm = ({
   file,
@@ -37,6 +44,9 @@ const OrderForm = ({
   handleSubmit,
   validationSchema,
 }) => {
+  // Menggunakan custom hook untuk deteksi negara
+  const { data: detectedCountry = 'id' } = useCountryDetection();
+
   const onDrop = useCallback(
     (acceptedFiles) => {
       if (acceptedFiles && acceptedFiles.length > 0) {
@@ -86,26 +96,6 @@ const OrderForm = ({
     return 'Pilih metode pembayaran di panel sebelah kiri';
   };
 
-  // Format nomor whatsapp
-  const formatWhatsAppNumber = (value) => {
-    let formattedValue = value.replace(/\D/g, '');
-
-    if (formattedValue.startsWith('0')) {
-      formattedValue = '62' + formattedValue.substring(1);
-    } else if (
-      formattedValue.startsWith('1') &&
-      !formattedValue.startsWith('60') &&
-      !formattedValue.startsWith('62')
-    ) {
-      formattedValue = '60' + formattedValue;
-    } else if (
-      formattedValue.startsWith('62') ||
-      formattedValue.startsWith('60')
-    ) {
-    }
-    return formattedValue;
-  };
-
   // Bersihkan input
   const sanitizeInput = (value) => {
     return DOMPurify.sanitize(value, {
@@ -132,6 +122,7 @@ const OrderForm = ({
               username: '',
               password: '',
               joki: '',
+              contactMethod: 'tiktok', // Default ke TikTok
               tiktokUsername: '',
               whatsappNumber: '',
             }}
@@ -142,14 +133,21 @@ const OrderForm = ({
                 username: sanitizeInput(values.username),
                 password: values.password,
                 joki: sanitizeInput(values.joki),
-                tiktokUsername: sanitizeInput(values.tiktokUsername),
-                whatsappNumber: values.whatsappNumber,
+                contactMethod: values.contactMethod,
+                tiktokUsername:
+                  values.contactMethod === 'tiktok'
+                    ? sanitizeInput(values.tiktokUsername)
+                    : '',
+                whatsappNumber:
+                  values.contactMethod === 'whatsapp'
+                    ? values.whatsappNumber
+                    : '',
               };
 
               handleSubmit(sanitizedValues, { setSubmitting, resetForm });
             }}
           >
-            {({ isSubmitting, setFieldValue, values }) => (
+            {({ isSubmitting, setFieldValue, values, isValid, dirty }) => (
               <Form className='space-y-4'>
                 <div className='space-y-2'>
                   <Label htmlFor='username' className='text-sm'>
@@ -206,61 +204,97 @@ const OrderForm = ({
                   />
                 </div>
 
+                {/* Radio Group untuk metode kontak */}
                 <div className='space-y-2'>
-                  <Label htmlFor='tiktokUsername' className='text-sm'>
-                    Username TikTok
-                  </Label>
-                  <Field
-                    as={Input}
-                    id='tiktokUsername'
-                    name='tiktokUsername'
-                    placeholder='@username_tiktok'
-                    className='h-10'
-                  />
+                  <Label className='text-sm'>Metode Kontak</Label>
+                  <RadioGroup
+                    value={values.contactMethod}
+                    onValueChange={(value) => {
+                      setFieldValue('contactMethod', value);
+                      // Reset field yang tidak dipilih
+                      if (value === 'tiktok') {
+                        setFieldValue('whatsappNumber', '');
+                      } else {
+                        setFieldValue('tiktokUsername', '');
+                      }
+                    }}
+                    className='flex space-x-4'
+                  >
+                    <div className='flex items-center space-x-2'>
+                      <RadioGroupItem value='tiktok' id='tiktok' />
+                      <Label htmlFor='tiktok'>TikTok</Label>
+                    </div>
+                    <div className='flex items-center space-x-2'>
+                      <RadioGroupItem value='whatsapp' id='whatsapp' />
+                      <Label htmlFor='whatsapp'>WhatsApp</Label>
+                    </div>
+                  </RadioGroup>
                   <ErrorMessage
-                    name='tiktokUsername'
+                    name='contactMethod'
                     component='div'
                     className='text-xs text-red-500'
                   />
                 </div>
 
-                <div className='space-y-2'>
-                  <Label htmlFor='whatsappNumber' className='text-sm'>
-                    Nomor WhatsApp
-                  </Label>
-                  <Field
-                    as={Input}
-                    id='whatsappNumber'
-                    name='whatsappNumber'
-                    placeholder='Contoh: 08123456789 (ID) atau 123456789 (MY)'
-                    className='h-10'
-                    onChange={(e) => {
-                      const value = e.target.value;
-                      // Tambah input pengguna
-                      if (value.length > values.whatsappNumber.length) {
-                        setFieldValue(
-                          'whatsappNumber',
-                          formatWhatsAppNumber(value)
-                        );
-                      } else {
-                        setFieldValue('whatsappNumber', value);
-                      }
-                    }}
-                  />
-                  <ErrorMessage
-                    name='whatsappNumber'
-                    component='div'
-                    className='text-xs text-red-500'
-                  />
-                  <div className='flex items-start mt-1'>
-                    <Info className='h-3 w-3 text-muted-foreground mr-1 mt-0.5 shrink-0' />
-                    <p className='text-xs text-muted-foreground'>
-                      Format otomatis: Indonesia (0xxx → 62xxx) atau Malaysia
-                      (1xxx → 601xxx). Untuk negara lain, masukkan dengan kode
-                      negara lengkap.
-                    </p>
+                {/* Input TikTok (hanya muncul jika TikTok dipilih) */}
+                {values.contactMethod === 'tiktok' && (
+                  <div className='space-y-2'>
+                    <Label htmlFor='tiktokUsername' className='text-sm'>
+                      Username TikTok
+                    </Label>
+                    <Field
+                      as={Input}
+                      id='tiktokUsername'
+                      name='tiktokUsername'
+                      placeholder='@username_tiktok'
+                      className='h-10'
+                    />
+                    <ErrorMessage
+                      name='tiktokUsername'
+                      component='div'
+                      className='text-xs text-red-500'
+                    />
                   </div>
-                </div>
+                )}
+
+                {/* Input WhatsApp (hanya muncul jika WhatsApp dipilih) */}
+                {values.contactMethod === 'whatsapp' && (
+                  <div className='space-y-2'>
+                    <Label htmlFor='whatsappNumber' className='text-sm'>
+                      Nomor WhatsApp
+                    </Label>
+                    <Field
+                      as={Input}
+                      id='whatsappNumber'
+                      name='whatsappNumber'
+                      placeholder='Contoh: 08123456789 (ID) atau 123456789 (MY)'
+                      className='h-10'
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        // Hanya format jika user mengetik (menambah karakter), bukan menghapus
+                        if (value.length > values.whatsappNumber.length) {
+                          const formattedValue = formatWhatsAppNumber(value);
+                          setFieldValue('whatsappNumber', formattedValue);
+                        } else {
+                          setFieldValue('whatsappNumber', value);
+                        }
+                      }}
+                    />
+                    <ErrorMessage
+                      name='whatsappNumber'
+                      component='div'
+                      className='text-xs text-red-500'
+                    />
+                    <div className='flex items-start mt-1'>
+                      <Info className='h-3 w-3 text-muted-foreground mr-1 mt-0.5 shrink-0' />
+                      <p className='text-xs text-muted-foreground'>
+                        Format otomatis: Indonesia (0xxx → 62xxx) atau Malaysia
+                        (1xxx → 601xxx). Untuk negara lain, masukkan dengan kode
+                        negara lengkap.
+                      </p>
+                    </div>
+                  </div>
+                )}
 
                 <div className='space-y-2'>
                   <Label className='text-sm'>Metode Pembayaran</Label>
@@ -327,7 +361,8 @@ const OrderForm = ({
                     isSubmitting ||
                     loading ||
                     !file ||
-                    (!values.tiktokUsername && !values.whatsappNumber) ||
+                    !isValid ||
+                    !dirty ||
                     (paymentMethod === 'bank' && !selectedBank) ||
                     (paymentMethod === 'ewallet' && !selectedEwallet) ||
                     (paymentMethod === 'qris' && !selectedQris)

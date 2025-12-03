@@ -26,22 +26,38 @@ const JokiOrderForm = () => {
 
   const { loading, error, success, submitOrder, copyToClipboard } =
     useOrderApi();
-  // Validasi form
-  const validationSchema = Yup.object()
-    .shape({
-      username: Yup.string().required('Username wajib diisi'),
-      password: Yup.string().required('Password wajib diisi'),
-      joki: Yup.string().required('Jenis joki wajib diisi'),
-      tiktokUsername: Yup.string().optional(),
-      whatsappNumber: Yup.string().optional(),
-    })
-    .test(
-      'tiktok-or-whatsapp',
-      'Setidaknya salah satu dari TikTok atau WhatsApp harus diisi',
+
+  // Validasi form dengan pendekatan custom validation
+  const validationSchema = Yup.object().shape({
+    username: Yup.string().required('Username wajib diisi'),
+    password: Yup.string().required('Password wajib diisi'),
+    joki: Yup.string().required('Jenis joki wajib diisi'),
+    contactMethod: Yup.string()
+      .oneOf(['tiktok', 'whatsapp'], 'Pilih metode kontak')
+      .required('Pilih metode kontak'),
+    tiktokUsername: Yup.string().test(
+      'tiktok-required',
+      'Username TikTok diperlukan',
       function (value) {
-        return !!(value.tiktokUsername || value.whatsappNumber);
+        const { contactMethod } = this.parent;
+        if (contactMethod === 'tiktok') {
+          return value && value.trim() !== '';
+        }
+        return true;
       }
-    );
+    ),
+    whatsappNumber: Yup.string().test(
+      'whatsapp-required',
+      'Nomor WhatsApp diperlukan',
+      function (value) {
+        const { contactMethod } = this.parent;
+        if (contactMethod === 'whatsapp') {
+          return value && value.trim() !== '';
+        }
+        return true;
+      }
+    ),
+  });
 
   useEffect(() => {
     if (success) {
